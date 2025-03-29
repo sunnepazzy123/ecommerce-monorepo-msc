@@ -1,0 +1,50 @@
+export enum EVENTS {
+  NewUser = 'NewUser',
+}
+
+export enum APP {
+  API_GATEWAY_SERVICE = 'API_GATEWAY_SERVICE',
+  AUTH_SERVICE = 'AUTH_SERVICE',
+  NOTIFICATION_SERVICE = 'NOTIFICATION_SERVICE',
+  PRODUCT_SERVICE = 'PRODUCT_SERVICE',
+  INVENTORY_SERVICE = 'INVENTORY_SERVICE',
+  ORDER_SERVICE = 'ORDER_SERVICE',
+  GPT_SERVICE = 'GPT_SERVICE',
+
+}
+
+export enum AUTH_REQUESTS {
+  GET_USERS = 'GET_USERS',
+  GET_USER_BY_ID = 'GET_USER_BY_ID',
+  POST_USERS = 'POST_USERS',
+  PUT_USER_BY_ID = 'PUT_USER_BY_ID',
+  DELETE_USER_BY_ID = 'DELETE_USER_BY_ID',
+}
+
+export enum   PRODUCT_REQUESTS {
+  GET_PRODUCTS = 'GET_PRODUCTS',
+}
+
+export enum   CATEGORY_REQUESTS {
+  GET_CATEGORIES = 'GET_CATEGORIES',
+}
+
+export enum   INVENTORY_REQUESTS {
+  GET_INVENTORY = 'GET_INVENTORY',
+}
+
+export enum   ORDER_REQUESTS {
+  GET_ORDER = 'GET_ORDER',
+}
+
+export enum OrderStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELED = 'canceled',
+}
+
+export enum   GPT_REQUESTS {
+  GET_GPTS = 'GET_GPTS',
+}

@@ -1,0 +1,6 @@
+apps/*
+!apps/api-gateway
+# node_modules
+# dist
+# Dockerfile
+# .git

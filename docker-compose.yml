@@ -1,0 +1,208 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+      target: development
+    command: npm run start api-gateway
+    container_name: api-gateway
+    pull_policy: always  # Always pull the latest image
+    restart: on-failure
+    networks:
+      - app-network
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./apps/api-gateway/.env.production
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start auth
+    container_name: auth
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/auth/.env.production
+    depends_on:
+      - mongodb-auth
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  product:
+    build:
+      context: .
+      dockerfile: ./apps/product/Dockerfile
+      target: development
+    command: npm run start product
+    container_name: product
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/product/.env.production
+    depends_on:
+      - mongodb-product
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  inventory:
+    build:
+      context: .
+      dockerfile: ./apps/inventory/Dockerfile
+      target: development
+    command: npm run start inventory
+    container_name: inventory
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/inventory/.env.production
+    depends_on:
+      - mongodb-inventory
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  notification:
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: development
+    command: npm run start notification
+    container_name: notification
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/notification/.env.production
+    depends_on:
+      - mongodb-notification
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  order:
+    build:
+      context: .
+      dockerfile: ./apps/order/Dockerfile
+      target: development
+    command: npm run start order
+    container_name: order
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/order/.env.production
+    depends_on:
+      - mongodb-order
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    networks:
+      - app-network
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  mongodb-auth:
+    image: mongo
+    container_name: mongodb-auth
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    volumes:
+      - mongodb_auth_data:/data/db
+    ports:
+      - '27019:27017'
+
+  mongodb-product:
+    image: mongo
+    container_name: mongodb-product
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    volumes:
+      - mongodb_product_data:/data/db
+    ports:
+      - '27020:27017'
+
+  mongodb-inventory:
+    image: mongo
+    container_name: mongodb-inventory
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    volumes:
+      - mongodb_inventory_data:/data/db
+    ports:
+      - '27021:27017'
+
+  mongodb-order:
+    image: mongo
+    container_name: mongodb-order
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    volumes:
+      - mongodb_order_data:/data/db
+    ports:
+      - '27022:27017'
+
+  mongodb-notification:
+    image: mongo
+    container_name: mongodb-notification
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    volumes:
+      - mongodb_notification_data:/data/db
+    ports:
+      - '27022:27017'
+
+volumes:
+  mongodb_auth_data:
+    driver: local
+  mongodb_product_data:
+    driver: local
+  mongodb_inventory_data:
+    driver: local
+  mongodb_notification_data:
+    driver: local
+  mongodb_order_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
