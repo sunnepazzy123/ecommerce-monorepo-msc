@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -37,4 +37,12 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   limit?: number = 10;
+}
+
+
+export class ChatPromptDto {
+  @IsString()
+  @ApiProperty()
+  @IsNotEmpty()
+  prompt: string;
 }

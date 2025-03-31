@@ -10,7 +10,6 @@ export enum APP {
   INVENTORY_SERVICE = 'INVENTORY_SERVICE',
   ORDER_SERVICE = 'ORDER_SERVICE',
   GPT_SERVICE = 'GPT_SERVICE',
-
 }
 
 export enum AUTH_REQUESTS {
@@ -21,19 +20,19 @@ export enum AUTH_REQUESTS {
   DELETE_USER_BY_ID = 'DELETE_USER_BY_ID',
 }
 
-export enum   PRODUCT_REQUESTS {
+export enum PRODUCT_REQUESTS {
   GET_PRODUCTS = 'GET_PRODUCTS',
 }
 
-export enum   CATEGORY_REQUESTS {
+export enum CATEGORY_REQUESTS {
   GET_CATEGORIES = 'GET_CATEGORIES',
 }
 
-export enum   INVENTORY_REQUESTS {
+export enum INVENTORY_REQUESTS {
   GET_INVENTORY = 'GET_INVENTORY',
 }
 
-export enum   ORDER_REQUESTS {
+export enum ORDER_REQUESTS {
   GET_ORDER = 'GET_ORDER',
 }
 
@@ -45,6 +44,6 @@ export enum OrderStatus {
   CANCELED = 'canceled',
 }
 
-export enum   GPT_REQUESTS {
-  GET_GPTS = 'GET_GPTS',
+export enum GPT_REQUESTS {
+  PROMPT_GPT = 'PROMPT_GPT',
 }

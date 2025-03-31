@@ -1,23 +1,20 @@
-import { Controller, Inject } from '@nestjs/common';
-import { MessagePattern, ClientProxy } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { GptService } from './gpt.service';
-
+import { GPT_REQUESTS } from '@app/common/constants/events';
 
 @Controller()
 export class GptController {
   
   constructor(
     private readonly aiChatService: GptService,
-    @Inject('ORDER_SERVICE') private readonly orderService: ClientProxy,
-    @Inject('INVENTORY_SERVICE') private readonly inventoryService: ClientProxy,
   ) {}
 
-  @MessagePattern({ cmd: 'ai_chat' })
+  @MessagePattern(GPT_REQUESTS.PROMPT_GPT)
   async handleChatRequest(data: { prompt: string }) {
     // Step 1: Use AI/NLP to determine which service to call
-    const service = this.aiChatService.detectService(data.prompt);
-    
-    const result = await this.aiChatService.runCommandPrompt(service as any)
+    const messageGpt = await this.aiChatService.detectService(data.prompt);
+    const result = await this.aiChatService.runCommandPrompt(messageGpt)
     return result;
   }
 }

@@ -1,41 +1,64 @@
+import { APP, PRODUCT_REQUESTS } from '@app/common/constants/events';
 import { ICommandPrompt } from '@app/common/dto/gpt.dto';
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
+import OpenAI from "openai";
+
+
+
 
 @Injectable()
 export class GptService {
+  private deepseekApiUrl: string;
+  private openai: OpenAI
 
-      constructor(
-        private readonly aiChatService: GptService,
-        @Inject('ORDER_SERVICE') private readonly orderService: ClientProxy,
-        @Inject('INVENTORY_SERVICE') private readonly inventoryService: ClientProxy,
-      ) {}
+  constructor(
+    @Inject(APP.ORDER_SERVICE) private readonly orderService: ClientProxy,
+    @Inject(APP.INVENTORY_SERVICE) private readonly inventoryService: ClientProxy,
+    @Inject(APP.PRODUCT_SERVICE) private readonly productService: ClientProxy,
+    private configService: ConfigService
+  ) {
+    this.deepseekApiUrl = this.configService.get('DEEPSEEK_API_URL')
+    this.openai = new OpenAI({
+      apiKey: this.configService.get('OPENAI_API_KEY'),
+    });
+  }
 
-    detectService(prompt: string): string {
-        const lowerPrompt = prompt.toLowerCase();
-    
-        if (lowerPrompt.includes('order') || lowerPrompt.includes('track my order')) {
-          return 'order';
-        }
-        if (lowerPrompt.includes('stock') || lowerPrompt.includes('available')) {
-          return 'inventory';
-        }
-    
-        return 'unknown';
-      }
+  async detectService(prompt: string) {
+    const lowerPrompt = prompt.toLowerCase();
+    const messageGpt = {
+      service: '',
+      intent: lowerPrompt
+    }
 
-    async runCommandPrompt(payload: ICommandPrompt) {
-      const { service, prompt } = payload
-      let response;
-      if (service === 'order') {
-        response = await this.orderService.send({ cmd: 'order_info' }, { prompt }).toPromise();
-      } else if (service === 'inventory') {
-        response = await this.inventoryService.send({ cmd: 'inventory_status' }, { prompt }).toPromise();
-      } else {
-        response = "I couldn't understand the request.";
+    try {
+
+      if (lowerPrompt.includes('order') || lowerPrompt.includes('track my order')) {
+        messageGpt.service = 'order'
+        return messageGpt;
       }
-      
-      return { service, response };
+      if (lowerPrompt.includes('products') || lowerPrompt.includes('products')) {
+        messageGpt.service = 'products'
+        return messageGpt;
       }
+      return messageGpt
+    } catch (error) {
+      return messageGpt
+    }
+
+
+  }
+
+  async runCommandPrompt(payload: ICommandPrompt) {
+
+    let response;
+
+    if (payload.service === 'products') {
+      response = this.productService.send(PRODUCT_REQUESTS.GET_PRODUCTS, payload);
+    }
+
+    return response
+  }
 
 }

@@ -16,6 +16,7 @@ export class ProductController {
 
   @MessagePattern(PRODUCT_REQUESTS.GET_PRODUCTS)
   async getProducts(@Payload() query: PaginationDto) {
+    console.log("loading...", query)
     const products = this.productService.getProducts(query);
     return products;
   }

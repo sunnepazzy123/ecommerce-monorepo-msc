@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  api-gateway:
+  api-gateway1:
     build:
       context: .
       dockerfile: ./apps/api-gateway/Dockerfile
       target: development
     command: npm run start api-gateway
-    container_name: api-gateway
+    container_name: api-gateway1
     pull_policy: always  # Always pull the latest image
     restart: on-failure
     networks:
@@ -16,6 +16,24 @@ services:
       - '3001:3001'
     env_file:
       - ./apps/api-gateway/.env.production
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  gpt:
+    build:
+      context: .
+      dockerfile: ./apps/gpt/Dockerfile
+      target: development
+    command: npm run start gpt
+    container_name: gpt
+    restart: on-failure
+    networks:
+      - app-network
+    env_file:
+      - ./apps/gpt/.env.production
     depends_on:
       - rabbitmq
     volumes:
@@ -119,7 +137,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq2
     networks:
       - app-network
     ports:

@@ -10,12 +10,14 @@ import { HealthModule } from './health.module';
 import { LoggerService } from '@app/common/helpers/logger.service';
 import { ProductController } from './controllers/product.controller';
 import { InventoryController } from './controllers/inventory.controller';
+import { GptController } from './controllers/gpt.controller';
 
 const serviceAppNames = [
   APP.AUTH_SERVICE,
   APP.NOTIFICATION_SERVICE,
   APP.PRODUCT_SERVICE,
-  APP.INVENTORY_SERVICE
+  APP.INVENTORY_SERVICE,
+  APP.GPT_SERVICE
 
 
   // Add more services here as needed
@@ -38,7 +40,7 @@ const createRmqModules = (moduleNames: string[]) => {
     MiddlewareModule,
     HealthModule,
   ],
-  controllers: [UsersController, ProductController, InventoryController],
+  controllers: [UsersController, ProductController, InventoryController, GptController],
   providers: [
     RmqService,
     LoggerService

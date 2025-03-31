@@ -8,6 +8,20 @@ import { getEnvironment } from '@app/common/constants/config';
 import { LoggerModule } from '@app/common/helpers/logger.module';
 import { HealthCheckService } from './health/health-check.service';
 import { GptController } from './gpt.controller';
+import { GptService } from './gpt.service';
+
+const serviceAppNames = [
+  APP.NOTIFICATION_SERVICE,
+  APP.PRODUCT_SERVICE,
+  APP.INVENTORY_SERVICE,
+  APP.ORDER_SERVICE,
+
+  // Add more services here as needed
+];
+
+const createRmqModules = (moduleNames: string[]) => {
+  return moduleNames.map((serviceName) => RmqModule.register({name: serviceName}));
+};
 
 @Module({
   imports: [
@@ -21,10 +35,11 @@ import { GptController } from './gpt.controller';
     RmqModule.register({
       name: APP.GPT_SERVICE,
     }),
+    ...createRmqModules(serviceAppNames),
     LoggerModule
   ],
   controllers: [GptController],
-  providers: [ConfigService, HealthCheckService],
+  providers: [GptService, ConfigService, HealthCheckService],
 })
 export class GptModule { 
 }
