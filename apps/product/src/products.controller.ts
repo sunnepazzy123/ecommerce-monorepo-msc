@@ -6,13 +6,14 @@ import {
 } from '@app/common/dto/create-user.dto';
 import { HealthCheckService } from './health/health-check.service';
 import { ProductService } from './products.service';
+import { CreateProductDto } from '@app/common/dto/products.dto';
 
 @Controller()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
     private readonly healthCheckService: HealthCheckService,
-  ) {}
+  ) { }
 
   @MessagePattern(PRODUCT_REQUESTS.GET_PRODUCTS)
   async getProducts(@Payload() query: PaginationDto) {
@@ -20,6 +21,11 @@ export class ProductController {
     return products;
   }
 
+  @MessagePattern(PRODUCT_REQUESTS.POST_PRODUCTS)
+  async postProducts(@Payload() body: CreateProductDto) {
+    const products = this.productService.createPost(body);
+    return products;
+  }
 
 
   @MessagePattern(APP.PRODUCT_SERVICE)

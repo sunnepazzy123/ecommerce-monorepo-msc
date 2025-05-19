@@ -23,6 +23,7 @@ export enum AUTH_REQUESTS {
 
 export enum   PRODUCT_REQUESTS {
   GET_PRODUCTS = 'GET_PRODUCTS',
+  POST_PRODUCTS = 'POST_PRODUCTS'
 }
 
 export enum   CATEGORY_REQUESTS {

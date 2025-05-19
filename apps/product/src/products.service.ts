@@ -1,23 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
-  CreateUserDto,
   PaginationDto,
-  UpdateUserDto,
 } from '@app/common/dto/create-user.dto';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { RpcException } from '@nestjs/microservices';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
-import { APP, AUTH_REQUESTS, } from '@app/common/constants/events';
-import { randomBytes } from 'crypto';
-import { hashPassword } from '@app/common/utils';
+import { CreateProductDto } from '@app/common/dto/products.dto';
 
 @Injectable()
 export class ProductService {
 
   constructor(
-    @InjectModel(Product.name) private readonly userModel: Model<Product>,
-    @Inject(APP.NOTIFICATION_SERVICE) private readonly authClient: ClientProxy, // Inject RMQ Client
+    @InjectModel(Product.name) private readonly productModel: Model<Product>,
   ) { }
 
 
@@ -25,8 +20,8 @@ export class ProductService {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
     try {
-      const users = await this.userModel.find().skip(skip).limit(limit);
-      const total = await this.userModel.countDocuments();
+      const users = await this.productModel.find().skip(skip).limit(limit);
+      const total = await this.productModel.countDocuments();
       return {
         total,
         page,
@@ -47,18 +42,18 @@ export class ProductService {
   }
 
 
-  async getUser(id: Types.ObjectId) {
+  async getProduct(id: Types.ObjectId) {
     try {
-      const user = await this.userModel.findById(id);
+      const product = await this.productModel.findById(id);
 
-      if (!user) {
+      if (!product) {
         throw new RpcException({
           status: 404,
-          message: `User with ID ${id} not found`,
+          message: `product with ID ${id} not found`,
         });
       }
 
-      return user;
+      return product;
     } catch (error) {
       if (error instanceof RpcException) {
         throw error; // Re-throw existing RpcException
@@ -66,91 +61,22 @@ export class ProductService {
 
       throw new RpcException({
         status: 500,
-        message: 'An unexpected error occurred while fetching the user',
+        message: 'An unexpected error occurred while fetching single products',
       });
     }
   }
 
-  async createUser(payload: CreateUserDto) {
+  async createPost(payload: CreateProductDto) {
     try {
-      let customer = await this.userModel.findOne({ email: payload.email });
-      if (customer) {
-        throw new RpcException({
-          status: 404,
-          message: 'Customer already exist',
-        });
-      }
-      //generate a salt and hash
-      const salt = randomBytes(8).toString('hex');
-      const { saltHash } = await hashPassword(payload.password, salt);
-      payload.password = saltHash;
-      customer = await this.userModel.create(payload);
-      customer = await customer.save();
-      this.authClient.emit(AUTH_REQUESTS.POST_USERS, customer);
-      return customer;
+      const product = this.productModel.create(payload)
+      return product
     } catch (error) {
       if (error instanceof RpcException) {
         throw error;
       }
       throw new RpcException({
         status: 500,
-        message: 'An unexpected error occurred while creating the user',
-      });
-    }
-  }
-
-  async updateUserById(user: UpdateUserDto) {
-    try {
-      if (user && user.password) {
-        //generate a salt and hash
-        const salt = randomBytes(8).toString('hex');
-        const { saltHash } = await hashPassword(user.password, salt);
-        user.password = saltHash
-      }
-
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        user.id,
-        { $set: user }, // Update only the provided fields
-        { new: true }, // Return the updated document
-      );
-
-      if (!updatedUser) {
-        throw new RpcException({
-          status: 404,
-          message: 'user not found',
-        });
-      }
-
-      return updatedUser;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-      throw new RpcException({
-        status: 500,
-        message: `An unexpected error occurred while updating the user ${user.id}`,
-      });
-    }
-  }
-
-  async deleteUserById(id: Types.ObjectId) {
-    try {
-      const deletedUser = await this.userModel.findByIdAndDelete(id);
-      if (!deletedUser) {
-        throw new RpcException({
-          status: 404,
-          message: `User with ID ${id} not found`,
-        });
-      }
-      this.authClient.emit(AUTH_REQUESTS.DELETE_USER_BY_ID, deletedUser);
-      return `User with ID ${deletedUser._id} deleted successfully`;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-      throw new RpcException({
-        status: 500,
-        message: `An unexpected error occurred while deleting the user ${id}`,
+        message: 'An unexpected error occurred while creating the products',
       });
     }
   }

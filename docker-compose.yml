@@ -150,7 +150,7 @@ services:
     volumes:
       - mongodb_product_data:/data/db
     ports:
-      - '27020:27017'
+      - '27018:27017'
 
   mongodb-inventory:
     image: mongo

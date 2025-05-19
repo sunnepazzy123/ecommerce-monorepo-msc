@@ -2,7 +2,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 export const swaggerDoc = (app: NestExpressApplication) => {
-  const TITLE = process.env.SWAGGER_DOC_TITLE || 'Ecommerce Management System (Microservice) Magmamath Task';
+  const TITLE = process.env.SWAGGER_DOC_TITLE || 'Ecommerce Management System (Microservice)';
 
   const userConfig = new DocumentBuilder()
     .setTitle(TITLE)
